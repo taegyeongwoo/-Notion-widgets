@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <title>D-Day 카운트다운 위젯</title>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                    Roboto, Helvetica, Arial, sans-serif;
+                margin: 0;
+                padding: 20px;
+                color: #37352f;
+                background-color: transparent;
+                line-height: 1.5;
+            }
+
+            .countdown-container {
+                max-width: 500px;
+                background-color: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                overflow: hidden;
+            }
+
+            .countdown-header {
+                background-color: #f7f6f3;
+                padding: 16px;
+                border-bottom: 1px solid #edece9;
+            }
+
+            .title-input {
+                width: 100%;
+                padding: 8px 12px;
+                font-size: 16px;
+                border: 1px solid #e0e0e0;
+                border-radius: 4px;
+                margin-bottom: 12px;
+            }
+
+            .date-input {
+                width: 100%;
+                padding: 8px 12px;
+                font-size: 16px;
+                border: 1px solid #e0e0e0;
+                border-radius: 4px;
+            }
+
+            .countdown-body {
+                padding: 20px;
+                text-align: center;
+            }
+
+            .event-title {
+                font-size: 20px;
+                font-weight: 600;
+                margin-bottom: 16px;
+            }
+
+            .countdown-display {
+                display: flex;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 16px;
+                margin-bottom: 20px;
+            }
+
+            .countdown-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                min-width: 70px;
+            }
+
+            .countdown-value {
+                font-size: 32px;
+                font-weight: 700;
+                color: #2382de;
+            }
+
+            .countdown-label {
+                font-size: 14px;
+                color: #888;
+            }
+
+            .progress-container {
+                width: 100%;
+                height: 8px;
+                background-color: #f0f0f0;
+                border-radius: 4px;
+                overflow: hidden;
+                margin-top: 20px;
+            }
+
+            .progress-bar {
+                height: 100%;
+                background-color: #2382de;
+                border-radius: 4px;
+                transition: width 0.3s ease;
+            }
+
+            .theme-selector {
+                margin-top: 12px;
+                display: flex;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .theme-option {
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                cursor: pointer;
+                border: 2px solid transparent;
+                transition: all 0.2s ease;
+            }
+
+            .theme-option.active {
+                transform: scale(1.2);
+                border-color: white;
+                box-shadow: 0 0 0 2px #888;
+            }
+
+            .button {
+                background-color: #2382de;
+                color: white;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 14px;
+                margin-top: 16px;
+                transition: background-color 0.2s ease;
+            }
+
+            .button:hover {
+                background-color: #1a6eb7;
+            }
+
+            .setup-container {
+                padding: 20px;
+            }
+
+            .setup-form {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .form-group {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .form-label {
+                font-size: 14px;
+                font-weight: 500;
+            }
+
+            .countdown-error {
+                color: #e57373;
+                font-size: 14px;
+                margin-top: 8px;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="countdown-container">
+            <div class="countdown-header">
+                <h2 style="margin-top: 0; margin-bottom: 12px">
+                    D-Day 카운트다운
+                </h2>
+            </div>
+
+            <div id="setupContainer" class="setup-container">
+                <div class="setup-form">
+                    <div class="form-group">
+                        <label class="form-label">이벤트 제목</label>
+                        <input
+                            type="text"
+                            id="eventTitle"
+                            class="title-input"
+                            placeholder="예: 프로젝트 마감일"
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">목표 날짜</label>
+                        <input
+                            type="datetime-local"
+                            id="targetDate"
+                            class="date-input"
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">테마 색상</label>
+                        <div class="theme-selector">
+                            <div
+                                class="theme-option active"
+                                style="background-color: #2382de"
+                                data-color="#2382de"
+                            ></div>
+                            <div
+                                class="theme-option"
+                                style="background-color: #27ae60"
+                                data-color="#27ae60"
+                            ></div>
+                            <div
+                                class="theme-option"
+                                style="background-color: #e67e22"
+                                data-color="#e67e22"
+                            ></div>
+                            <div
+                                class="theme-option"
+                                style="background-color: #e74c3c"
+                                data-color="#e74c3c"
+                            ></div>
+                            <div
+                                class="theme-option"
+                                style="background-color: #9b59b6"
+                                data-color="#9b59b6"
+                            ></div>
+                        </div>
+                    </div>
+
+                    <button id="startCountdown" class="button">
+                        카운트다운 시작
+                    </button>
+                </div>
+            </div>
+
+            <div
+                id="countdownContainer"
+                class="countdown-body"
+                style="display: none"
+            >
+                <div id="eventTitleDisplay" class="event-title">
+                    이벤트 제목
+                </div>
+
+                <div class="countdown-display">
+                    <div class="countdown-item">
+                        <div id="days" class="countdown-value">00</div>
+                        <div class="countdown-label">일</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div id="hours" class="countdown-value">00</div>
+                        <div class="countdown-label">시간</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div id="minutes" class="countdown-value">00</div>
+                        <div class="countdown-label">분</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div id="seconds" class="countdown-value">00</div>
+                        <div class="countdown-label">초</div>
+                    </div>
+                </div>
+
+                <div
+                    id="targetDateDisplay"
+                    style="margin-bottom: 20px; font-size: 14px"
+                ></div>
+
+                <div class="progress-container">
+                    <div
+                        id="progressBar"
+                        class="progress-bar"
+                        style="width: 0%"
+                    ></div>
+                </div>
+
+                <button id="resetCountdown" class="button">재설정</button>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+              // 현재 날짜와 시간으로 기본값 설정
+              const now = new Date();
+              const year = now.getFullYear();
+              const month = String(now.getMonth() + 1).padStart(2, '0');
+              const day = String(now.getDate()).padStart(2, '0');
+              const hours = String(now.getHours()).padStart(2, '0');
+              const minutes = String(now.getMinutes()).padStart(2, '0');
+
+              document.getElementById('targetDate').value = `${year}-${month}-${day}T${hours}:${minutes}`;
+
+              let themeColor = '#2382de';
+              let targetDateValue = null;
+              let startDateValue = null;
+              let countdownInterval = null;
+
+              // 로컬 스토리지에서 저장된 데이터 로드
+              loadSavedData();
+
+              // 테마 색상 선택
+              document.querySelectorAll('.theme-option').forEach(option => {
+                option.addEventListener('click', function() {
+                  document.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('active'));
+                  this.classList.add('active');
+                  themeColor = this.getAttribute('data-color');
+
+                  // 색상 변경 적용
+                  document.querySelectorAll('.countdown-value').forEach(el => el.style.color = themeColor);
+                  document.querySelector('.progress-bar').style.backgroundColor = themeColor;
+                  document.querySelectorAll('.button').forEach(btn => btn.style.backgroundColor = themeColor);
+                });
+              });
+
+              // 카운트다운 시작 버튼
+              document.getElementById('startCountdown').addEventListener('click', function() {
+                const eventTitle = document.getElementById('eventTitle').value;
+                const targetDate = document.getElementById('targetDate').value;
+
+                if (!eventTitle || !targetDate) {
+                  alert('이벤트 제목과 목표 날짜를 모두 입력해주세요.');
+                  return;
+                }
+
+                targetDateValue = new Date(targetDate);
+                startDateValue = new Date();
+
+                if (targetDateValue <= startDateValue) {
+                  alert('목표 날짜는 현재 시간보다 미래의 시간이어야 합니다.');
+                  return;
+                }
+
+                // 카운트다운 시작
+                setCountdown(eventTitle, targetDateValue);
+
+                // 설정 저장
+                saveData(eventTitle, targetDateValue, startDateValue, themeColor);
+              });
+
+              // 재설정 버튼
+              document.getElementById('resetCountdown').addEventListener('click', function() {
+                clearInterval(countdownInterval);
+                document.getElementById('setupContainer').style.display = 'block';
+                document.getElementById('countdownContainer').style.display = 'none';
+
+                // 저장된 데이터 삭제
+                localStorage.removeItem('notionCountdownData');
+              });
+
+              // 카운트다운 설정 함수
+              function setCountdown(title, targetDate) {
+                document.getElementById('eventTitleDisplay').textContent = title;
+                document.getElementById('targetDateDisplay').textContent = `목표일: ${formatDate(targetDate)}`;
+
+                // 색상 적용
+                document.querySelectorAll('.countdown-value').forEach(el => el.style.color = themeColor);
+                document.querySelector('.progress-bar').style.backgroundColor = themeColor;
+                document.querySelectorAll('.button').forEach(btn => btn.style.backgroundColor = themeColor);
+
+                // 화면 전환
+                document.getElementById('setupContainer').style.display = 'none';
+                document.getElementById('countdownContainer').style.display = 'block';
+
+                // 카운트다운 시작
+                updateCountdown();
+                countdownInterval = setInterval(updateCountdown, 1000);
+              }
+
+              // 카운트다운 업데이트 함수
+              function updateCountdown() {
+                const now = new Date();
+                const diff = targetDateValue - now;
+
+                if (diff <= 0) {
+                  clearInterval(countdownInterval);
+                  document.getElementById('days').textContent = '00';
+                  document.getElementById('hours').textContent = '00';
+                  document.getElementById('minutes').textContent = '00';
+                  document.getElementById('seconds').textContent = '00';
+                  document.getElementById('progressBar').style.width = '100%';
+                  document.getElementById('eventTitleDisplay').textContent = `${document.getElementById('eventTitleDisplay').textContent} (완료)`;
+                  return;
+                }
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                document.getElementById('days').textContent = days.toString().padStart(2, '0');
+                document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+                document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+                document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+
+                // 진행률 계산
+                if (startDateValue) {
+                  const totalTime = targetDateValue - startDateValue;
+                  const elapsedTime = now - startDateValue;
+                  const progressPercentage = (elapsedTime / totalTime) * 100;
+                  document.getElementById('progressBar').style.width = `${Math.min(progressPercentage, 100)}%`;
+                }
+              }
+
+              // 날짜 포맷 함수
+              function formatDate(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+
+                return `${year}년 ${month}월 ${day}일 ${hours}:${minutes}`;
+              }
+
+              // 데이터 저장 함수
+              function saveData(title, targetDate, startDate, color) {
+                const data = {
+                  title: title,
+                  targetDate: targetDate.toISOString(),
+                  startDate: startDate.toISOString(),
+                  themeColor: color
+                };
+                localStorage.setItem('notionCountdownData', JSON.stringify(data));
+              }
+
+              // 저장된 데이터 로드 함수
+            function loadSavedData() {
+            const savedData = localStorage.getItem('notionCountdownData');
+            if (savedData) {
+                try {
+                const data = JSON.parse(savedData);
+                document.getElementById('eventTitle').value = data.title;
+                targetDateValue = new Date(data.targetDate);
+                startDateValue = new Date(data.startDate);
+                themeColor = data.themeColor;
+
+                // 테마 색상 적용
+                document.querySelectorAll('.theme-option').forEach(option => {
+                    if (option.getAttribute('data-color') === themeColor) {
+                    option.classList.add('active');
+                    } else {
+                    option.classList.remove('active');
+                    }
+                });
+
+                // 카운트다운 시작
+                setCountdown(data.title, targetDateValue);
+                } catch (error) {
+                console.error('저장된 데이터를 불러오는 데 실패했습니다:', error);
+                localStorage.removeItem('notionCountdownData');
+                }
+            }
+            }
+        </script>
+    </body>
+</html>
